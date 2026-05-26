@@ -154,6 +154,9 @@ export function getPrivacyPolicySections(info: LegalContactInfo): LegalSection[]
           "Podatke o terminima i profilu čuvamo dok postoji aktivan nalog ili dok je potrebno radi vođenja salona.",
         ),
         t(
+          "Zapis o terminu (datum, status, ime i telefon ako su uneti) automatski se briše najkasnije 12 meseci nakon datuma termina. Korisnički nalog i ostali podaci se time ne brišu.",
+        ),
+        t(
           "Možete zatražiti brisanje naloga i povezanih podataka kontaktiranjem na email naveden u odeljku 2.",
         ),
         t(
