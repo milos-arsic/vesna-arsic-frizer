@@ -89,7 +89,7 @@ export const appointments = pgTable(
       onDelete: "set null",
     }),
     customerName: text("customer_name"),
-    customerPhone: text("customer_phone").notNull(),
+    customerPhone: text("customer_phone"),
     customerNote: text("customer_note"),
     adminMessage: text("admin_message"),
     googleCalendarEventId: text("google_calendar_event_id"),

@@ -159,7 +159,7 @@ export type CalendarSlot = {
   status: SlotStatus;
   appointmentId?: string;
   customerName?: string | null;
-  customerPhone?: string;
+  customerPhone?: string | null;
   customerNote?: string | null;
   adminMessage?: string | null;
   isPast: boolean;
@@ -171,7 +171,7 @@ export type AppointmentRecord = {
   status: "pending" | "approved" | "rejected" | "cancelled" | "manual";
   customerUserId: string | null;
   customerName: string | null;
-  customerPhone: string;
+  customerPhone: string | null;
   customerNote: string | null;
   adminMessage: string | null;
 };

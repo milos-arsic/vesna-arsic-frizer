@@ -1,3 +1,4 @@
+import { getAdminNotificationEmails } from "@/auth";
 import { Resend } from "resend";
 import { formatSlotDateTime } from "./slots";
 
@@ -18,15 +19,23 @@ type SendEmailParams = {
 async function sendEmail({ to, subject, html }: SendEmailParams) {
   if (!resend) {
     console.warn("[email] RESEND_API_KEY not set, skipping:", subject, "→", to);
-    return;
+    return false;
   }
 
-  await resend.emails.send({
+  const { data, error } = await resend.emails.send({
     from: fromEmail,
     to,
     subject,
     html,
   });
+
+  if (error) {
+    console.error("[email] Resend failed:", { subject, to, from: fromEmail, error });
+    return false;
+  }
+
+  console.info("[email] sent:", { subject, to, id: data?.id });
+  return true;
 }
 
 function baseTemplate(content: string) {
@@ -57,7 +66,7 @@ export async function sendNewRequestToAdmin(params: {
     ? `<p><strong>Захтев за промену термина:</strong> ${formatSlotDateTime(params.previousSlotStart)} → ${slotLabel}</p>`
     : "";
 
-  await sendEmail({
+  return sendEmail({
     to: params.adminEmail,
     subject: params.previousSlotStart
       ? `Захтев за промену термина – ${slotLabel}`
@@ -74,6 +83,38 @@ export async function sendNewRequestToAdmin(params: {
       <p>Пријавите се у апликацију да одобрите или одбијете захтев.</p>
     `),
   });
+}
+
+export async function notifyAdminsOfNewRequest(params: {
+  customerName: string;
+  customerPhone: string;
+  slotStart: Date;
+  customerNote?: string | null;
+  previousSlotStart?: Date | null;
+}) {
+  const adminEmails = await getAdminNotificationEmails();
+
+  if (adminEmails.length === 0) {
+    console.warn(
+      "[email] No admin recipients — set ADMIN_EMAILS in .env or sign in once as admin",
+    );
+    return;
+  }
+
+  const results = await Promise.all(
+    adminEmails.map((adminEmail) =>
+      sendNewRequestToAdmin({ ...params, adminEmail }),
+    ),
+  );
+
+  const sentCount = results.filter(Boolean).length;
+  if (sentCount === 0) {
+    console.error("[email] Failed to notify any admin for new booking request");
+  } else if (sentCount < adminEmails.length) {
+    console.warn(
+      `[email] Notified ${sentCount}/${adminEmails.length} admin inboxes`,
+    );
+  }
 }
 
 export async function sendRequestApprovedToCustomer(params: {

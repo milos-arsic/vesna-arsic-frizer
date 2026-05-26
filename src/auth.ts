@@ -136,3 +136,12 @@ export async function getAdminUsers() {
     where: eq(users.role, "admin"),
   });
 }
+
+/** Admin inboxes for notifications — env list plus any admin users in the DB. */
+export async function getAdminNotificationEmails(): Promise<string[]> {
+  const envEmails = getAdminEmails();
+  const adminUsers = await getAdminUsers();
+  const dbEmails = adminUsers.map((user) => user.email.trim().toLowerCase());
+
+  return [...new Set([...envEmails, ...dbEmails])].filter(Boolean);
+}

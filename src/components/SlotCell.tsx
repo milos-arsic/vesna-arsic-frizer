@@ -6,6 +6,7 @@ import {
   SLOT_STATUS_LABELS,
   type ApiSlot,
 } from "@/lib/calendar-types";
+import { msg } from "@/lib/messages";
 
 type SlotCellProps = {
   slot: ApiSlot;
@@ -59,8 +60,12 @@ export function SlotCell({
       >
         {adminDetails ? (
           <span className="flex min-w-0 flex-col gap-0.5">
-            <span className="truncate text-sm font-semibold">{slot.customerName}</span>
-            <span className="truncate text-sm opacity-80">{slot.customerPhone}</span>
+            <span className="truncate text-sm font-semibold">
+              {slot.customerName ?? msg.client}
+            </span>
+            {slot.customerPhone ? (
+              <span className="truncate text-sm opacity-80">{slot.customerPhone}</span>
+            ) : null}
           </span>
         ) : (
           <span className="text-sm font-semibold">{label}</span>
@@ -86,13 +91,15 @@ export function SlotCell({
           <span
             className={`block truncate font-semibold ${compact ? "text-[9px]" : "text-[10px]"}`}
           >
-            {slot.customerName}
+            {slot.customerName ?? msg.client}
           </span>
-          <span
-            className={`block truncate font-normal opacity-80 ${compact ? "text-[9px]" : "text-[10px]"}`}
-          >
-            {slot.customerPhone}
-          </span>
+          {slot.customerPhone ? (
+            <span
+              className={`block truncate font-normal opacity-80 ${compact ? "text-[9px]" : "text-[10px]"}`}
+            >
+              {slot.customerPhone}
+            </span>
+          ) : null}
         </span>
       ) : (
         <span className={`block font-medium ${compact ? "text-[10px]" : "text-xs"}`}>

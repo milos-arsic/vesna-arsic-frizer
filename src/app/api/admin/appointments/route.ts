@@ -15,8 +15,14 @@ import { z } from "zod";
 
 const manualSchema = z.object({
   slotStart: z.string().datetime(),
-  customerName: z.string().trim().min(2).max(100),
-  customerPhone: z.string().trim().min(6).max(20),
+  customerName: z.string().trim().min(2, msg.nameRequired).max(100),
+  customerPhone: z
+    .string()
+    .trim()
+    .max(20)
+    .optional()
+    .or(z.literal(""))
+    .refine((value) => !value || value.length >= 6, msg.phoneRequired),
   customerEmail: z.string().email().optional().or(z.literal("")),
 });
 
@@ -78,7 +84,7 @@ export async function POST(request: Request) {
       slotStart,
       status: "manual",
       customerName: parsed.data.customerName,
-      customerPhone: parsed.data.customerPhone,
+      customerPhone: parsed.data.customerPhone?.trim() || null,
       createdBy: session.user.id,
     })
     .returning();

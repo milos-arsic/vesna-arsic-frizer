@@ -14,7 +14,7 @@ export type ApiSlot = {
     | "mine_approved";
   appointmentId?: string;
   customerName?: string | null;
-  customerPhone?: string;
+  customerPhone?: string | null;
   customerNote?: string | null;
   adminMessage?: string | null;
   isPast: boolean;
@@ -35,7 +35,7 @@ export type PendingAppointment = {
   id: string;
   slotStart: string;
   customerName: string | null;
-  customerPhone: string;
+  customerPhone: string | null;
   customerNote: string | null;
 };
 

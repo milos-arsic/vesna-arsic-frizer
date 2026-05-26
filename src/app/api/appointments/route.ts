@@ -1,7 +1,7 @@
-import { auth, getAdminUsers } from "@/auth";
+import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { appointments, users } from "@/lib/db/schema";
-import { sendNewRequestToAdmin } from "@/lib/email";
+import { notifyAdminsOfNewRequest } from "@/lib/email";
 import { deleteCustomerCalendarEvent } from "@/lib/google-calendar";
 import {
   canNavigateToWeek,
@@ -137,19 +137,13 @@ export async function POST(request: Request) {
       .where(eq(appointments.id, existingApproved.id))
       .returning();
 
-    const admins = await getAdminUsers();
-    await Promise.all(
-      admins.map((admin) =>
-        sendNewRequestToAdmin({
-          adminEmail: admin.email,
-          customerName: user.name ?? msg.client,
-          customerPhone: user.phone!,
-          slotStart,
-          customerNote: parsed.data.customerNote,
-          previousSlotStart,
-        }),
-      ),
-    );
+    await notifyAdminsOfNewRequest({
+      customerName: user.name ?? msg.client,
+      customerPhone: user.phone!,
+      slotStart,
+      customerNote: parsed.data.customerNote,
+      previousSlotStart,
+    });
 
     return NextResponse.json({ appointment }, { status: 200 });
   }
@@ -181,18 +175,12 @@ export async function POST(request: Request) {
     })
     .returning();
 
-  const admins = await getAdminUsers();
-  await Promise.all(
-    admins.map((admin) =>
-      sendNewRequestToAdmin({
-        adminEmail: admin.email,
-        customerName: user.name ?? msg.client,
-        customerPhone: user.phone!,
-        slotStart,
-        customerNote: parsed.data.customerNote,
-      }),
-    ),
-  );
+  await notifyAdminsOfNewRequest({
+    customerName: user.name ?? msg.client,
+    customerPhone: user.phone!,
+    slotStart,
+    customerNote: parsed.data.customerNote,
+  });
 
   return NextResponse.json({ appointment }, { status: 201 });
 }

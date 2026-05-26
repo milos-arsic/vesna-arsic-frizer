@@ -16,6 +16,14 @@ import {
 import { msg } from "@/lib/messages";
 import { formatWeekLabel, parseWeekParam } from "@/lib/slots";
 
+function formatCustomerLine(
+  name?: string | null,
+  phone?: string | null,
+): string {
+  const parts = [name?.trim(), phone?.trim()].filter(Boolean);
+  return parts.join(" · ") || msg.client;
+}
+
 function getUniqueTimeLabels(slots: ApiSlot[]): string[] {
   return Array.from(new Set(slots.map((slot) => slot.timeLabel))).sort();
 }
@@ -52,6 +60,8 @@ function getDayLabels(weekStartIso: string): {
   });
 }
 
+const POLL_INTERVAL_MS = 30_000;
+
 type WeekCalendarProps = {
   isAdmin?: boolean;
   shopPhone?: string;
@@ -79,9 +89,13 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
   });
   const [bookingIntent, setBookingIntent] = useState<BookingIntent>(null);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const loadData = useCallback(async (options?: { silent?: boolean }) => {
+    const silent = options?.silent ?? false;
+
+    if (!silent) {
+      setLoading(true);
+      setError(null);
+    }
 
     try {
       const weekQuery = weekParam ? `?week=${weekParam}` : "";
@@ -100,15 +114,45 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
         setPending(pendingData.pending ?? []);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : msg.error);
+      if (!silent) {
+        setError(err instanceof Error ? err.message : msg.error);
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, [weekParam, isAdmin]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    const poll = () => {
+      if (document.visibilityState === "visible") {
+        void loadData({ silent: true });
+      }
+    };
+
+    const intervalId = window.setInterval(poll, POLL_INTERVAL_MS);
+    const onVisible = () => poll();
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [loadData]);
+
+  useEffect(() => {
+    if (!data || !selectedSlot) return;
+
+    const updated = data.slots.find((slot) => slot.start === selectedSlot.start);
+    if (updated && updated.status !== selectedSlot.status) {
+      setSelectedSlot(updated);
+    }
+  }, [data, selectedSlot]);
 
   const timeLabels = useMemo(
     () => (data ? getUniqueTimeLabels(data.slots) : []),
@@ -232,6 +276,13 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
 
   async function createManualBooking() {
     if (!selectedSlot) return;
+
+    const customerName = manualForm.customerName.trim();
+    if (customerName.length < 2) {
+      setError(msg.nameRequired);
+      return;
+    }
+
     setActionLoading(true);
     setError(null);
 
@@ -241,7 +292,9 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slotStart: selectedSlot.start,
-          ...manualForm,
+          customerName,
+          customerPhone: manualForm.customerPhone.trim(),
+          customerEmail: manualForm.customerEmail.trim(),
         }),
       });
 
@@ -330,7 +383,7 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
                     {formatSlotDateTime(item.slotStart)}
                   </p>
                   <p className="text-sm text-stone-600">
-                    {item.customerName ?? msg.client} · {item.customerPhone}
+                    {formatCustomerLine(item.customerName, item.customerPhone)}
                   </p>
                   {item.customerNote && (
                     <p className="text-sm text-stone-500">{item.customerNote}</p>
@@ -653,7 +706,7 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
                   onChange={(event) =>
                     setManualForm((prev) => ({ ...prev, customerPhone: event.target.value }))
                   }
-                  placeholder={msg.phone}
+                  placeholder={msg.phoneOptional}
                   className="w-full rounded-xl border border-stone-300 px-3 py-3 text-base sm:text-sm"
                 />
                 <input
@@ -675,7 +728,7 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
                   </button>
                   <button
                     type="button"
-                    disabled={actionLoading}
+                    disabled={actionLoading || manualForm.customerName.trim().length < 2}
                     onClick={createManualBooking}
                     className="btn-primary min-h-11 flex-1 px-4 py-3 text-sm sm:py-2"
                   >
@@ -688,7 +741,10 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
             {!actionLoading && isAdmin && selectedSlot.status === "pending" && (
               <div className="mt-4 space-y-3">
                 <p className="text-sm text-stone-600">
-                  {selectedSlot.customerName} · {selectedSlot.customerPhone}
+                  {formatCustomerLine(
+                    selectedSlot.customerName,
+                    selectedSlot.customerPhone,
+                  )}
                 </p>
                 {selectedSlot.customerNote && (
                   <p className="text-sm text-stone-500">{selectedSlot.customerNote}</p>
@@ -735,7 +791,10 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
                 selectedSlot.status === "mine_approved") && (
                 <div className="mt-4 space-y-3">
                   <p className="text-sm text-stone-600">
-                    {selectedSlot.customerName ?? msg.client} · {selectedSlot.customerPhone}
+                    {formatCustomerLine(
+                      selectedSlot.customerName,
+                      selectedSlot.customerPhone,
+                    )}
                   </p>
                   <button
                     type="button"
