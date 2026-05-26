@@ -56,6 +56,14 @@ export default function LoginForm() {
             <GoogleIcon />
             {msg.loginButton}
           </button>
+
+          <p className="text-center text-xs leading-relaxed text-stone-500">
+            {msg.loginPrivacyNotice}{" "}
+            <a href="/privacy" className="font-medium text-amber-800 underline-offset-2 hover:underline">
+              {msg.loginPrivacyLink}
+            </a>
+            .
+          </p>
         </div>
       </GlassCard>
     </main>

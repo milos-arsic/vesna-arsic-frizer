@@ -5,14 +5,26 @@ import { SalonBackground } from "@/components/SalonBackground";
 import { msg } from "@/lib/messages";
 import "./globals.css";
 
+const siteUrl =
+  process.env.AUTH_URL?.replace(/\/$/, "") || "https://vesna.hair";
+
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin", "cyrillic"],
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: msg.pageTitle,
   description: msg.pageDescription,
+  openGraph: {
+    title: msg.homeMetaTitle,
+    description: msg.pageDescription,
+    url: siteUrl,
+    siteName: msg.navBrand,
+    locale: "sr_RS",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

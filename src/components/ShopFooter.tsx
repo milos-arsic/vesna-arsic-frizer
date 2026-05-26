@@ -1,5 +1,6 @@
 import { getShopInfo } from "@/lib/shop";
 import { msg } from "@/lib/messages";
+import { LegalFooterLinks } from "@/components/LegalFooterLinks";
 
 function MapPinIcon() {
   return (
@@ -118,6 +119,7 @@ export function ShopFooter() {
             </div>
           </div>
         </div>
+        <LegalFooterLinks />
       </div>
     </footer>
   );

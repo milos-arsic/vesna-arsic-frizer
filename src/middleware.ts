@@ -6,8 +6,10 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const hasPhone = !!req.auth?.user?.phone;
 
-  const publicPaths = ["/login"];
-  const isPublic = publicPaths.some((path) => pathname.startsWith(path));
+  const publicPaths = ["/login", "/privacy", "/terms", "/"];
+  const isPublic = publicPaths.some(
+    (path) => pathname === path || (path !== "/" && pathname.startsWith(path)),
+  );
 
   if (!isLoggedIn && !isPublic) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
@@ -16,7 +18,12 @@ export default auth((req) => {
   }
 
   if (isLoggedIn && pathname === "/login") {
-    const destination = hasPhone ? "/calendar" : "/profile";
+    const isAdmin = req.auth?.user?.role === "admin";
+    const destination = hasPhone
+      ? isAdmin
+        ? "/admin"
+        : "/calendar"
+      : "/profile";
     return NextResponse.redirect(new URL(destination, req.nextUrl.origin));
   }
 
