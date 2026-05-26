@@ -1,15 +1,23 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { GlassCard } from "@/components/GlassCard";
 import { ScissorsIcon } from "@/components/icons/ScissorsIcon";
+import { signInWithGoogle } from "@/lib/google-auth";
 import { msg } from "@/lib/messages";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/calendar";
   const error = searchParams.get("error");
+
+  function getLoginErrorMessage(code: string | null) {
+    if (!code) return null;
+    if (code === "AccessDenied") return msg.loginAccessDenied;
+    return msg.loginFailed;
+  }
+
+  const loginError = getLoginErrorMessage(error);
 
   return (
     <main className="flex min-h-full flex-1 items-center justify-center px-3 py-8 sm:px-4 sm:py-16">
@@ -34,15 +42,15 @@ export default function LoginForm() {
             </p>
           </div>
 
-          {error && (
+          {loginError && (
             <p className="rounded-xl border border-red-100 bg-red-50/90 px-4 py-3 text-sm text-red-700">
-              {msg.loginFailed}
+              {loginError}
             </p>
           )}
 
           <button
             type="button"
-            onClick={() => signIn("google", { callbackUrl })}
+            onClick={() => signInWithGoogle(callbackUrl)}
             className="flex min-h-11 w-full items-center justify-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3.5 text-sm font-semibold text-stone-800 shadow-sm transition hover:border-stone-300 hover:bg-stone-50 hover:shadow-md"
           >
             <GoogleIcon />

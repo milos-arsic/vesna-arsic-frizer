@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Makaze">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c56a0f" />
+      <stop offset="100%" stop-color="#9a3412" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)" />
+  <g transform="translate(32 32) rotate(-28)">
+    <g fill="none" stroke="#fff7ed" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="-9" cy="-11" r="5.2" />
+      <circle cx="-9" cy="11" r="5.2" />
+      <path d="M-4 -6 L18 18" />
+      <path d="M-4 6 L18 -18" />
+    </g>
+    <circle cx="0" cy="0" r="2.2" fill="#fff7ed" />
+  </g>
+</svg>

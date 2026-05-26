@@ -14,6 +14,7 @@ import {
   type SlotsResponse,
 } from "@/lib/calendar-types";
 import { msg } from "@/lib/messages";
+import { formatWeekLabel, parseWeekParam } from "@/lib/slots";
 
 function getUniqueTimeLabels(slots: ApiSlot[]): string[] {
   return Array.from(new Set(slots.map((slot) => slot.timeLabel))).sort();
@@ -132,6 +133,16 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
 
   const approvedSlotThisWeek = useMemo(
     () => data?.slots.find((slot) => slot.status === "mine_approved") ?? null,
+    [data],
+  );
+
+  const previousWeekLabel = useMemo(
+    () => (data ? formatWeekLabel(parseWeekParam(data.previousWeek)) : ""),
+    [data],
+  );
+
+  const nextWeekLabel = useMemo(
+    () => (data ? formatWeekLabel(parseWeekParam(data.nextWeek)) : ""),
     [data],
   );
 
@@ -342,29 +353,39 @@ export function WeekCalendar({ isAdmin = false, shopPhone }: WeekCalendarProps) 
       )}
 
       <GlassCard className="p-4 sm:p-5">
-        <div className="flex flex-col gap-4">
-          <div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
             <h2 className="text-xl font-semibold text-stone-900 sm:text-2xl">
               {msg.weeklySchedule}
             </h2>
-            <p className="mt-1 text-sm text-stone-500">{msg.scheduleHours}</p>
+            <p className="mt-0.5 text-sm text-stone-500">{msg.scheduleHours}</p>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-end">
+          <div className="flex shrink-0 items-center gap-2">
             <button
               type="button"
               disabled={!data.canGoPrevious}
               onClick={() => navigateWeek(data.previousWeek)}
-              className="btn-secondary min-h-11 px-3 py-2.5 text-sm disabled:opacity-40"
+              className="btn-secondary min-h-10 min-w-[5.5rem] px-2 py-1.5 disabled:opacity-40 sm:min-h-11 sm:min-w-[7rem] sm:px-2.5 sm:py-2"
             >
-              {msg.previousWeek}
+              <span className="flex flex-col items-center leading-tight">
+                <span className="text-xs sm:text-sm">{msg.previousWeek}</span>
+                <span className="mt-0.5 text-[10px] font-normal text-stone-500 sm:text-xs">
+                  {previousWeekLabel}
+                </span>
+              </span>
             </button>
             <button
               type="button"
               disabled={!data.canGoNext}
               onClick={() => navigateWeek(data.nextWeek)}
-              className="btn-secondary min-h-11 px-3 py-2.5 text-sm disabled:opacity-40"
+              className="btn-secondary min-h-10 min-w-[5.5rem] px-2 py-1.5 disabled:opacity-40 sm:min-h-11 sm:min-w-[7rem] sm:px-2.5 sm:py-2"
             >
-              {msg.nextWeek}
+              <span className="flex flex-col items-center leading-tight">
+                <span className="text-xs sm:text-sm">{msg.nextWeek}</span>
+                <span className="mt-0.5 text-[10px] font-normal text-stone-500 sm:text-xs">
+                  {nextWeekLabel}
+                </span>
+              </span>
             </button>
           </div>
         </div>

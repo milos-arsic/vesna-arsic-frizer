@@ -3,10 +3,9 @@ import { formatInTimeZone } from "date-fns-tz";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { accounts } from "@/lib/db/schema";
+import { GOOGLE_CALENDAR_SCOPE } from "@/lib/google-auth";
 import { getShopInfo } from "@/lib/shop";
 import { TIMEZONE } from "@/lib/slots";
-
-const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
 
 function formatCalendarDateTime(date: Date): string {
   return formatInTimeZone(date, TIMEZONE, "yyyy-MM-dd'T'HH:mm:ss");

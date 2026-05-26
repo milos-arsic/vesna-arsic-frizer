@@ -13,6 +13,14 @@ export const msg = {
   loginTitle: "Весна Арсић",
   loginDescription: "Пријавите се Google nalogom да бисте видели слободне термине и послали захтев.",
   loginFailed: "Пријава није успела. Покушајте поново.",
+  loginAccessDenied:
+    "Google није одобрио пријаву. Проверите да ли сте на листи тест корисника у Google Cloud конзоли, или покушајте поново.",
+  calendarConnectTitle: "Google календар",
+  calendarConnectDescription:
+    "Да бисте добили термин у календару после одобрења, једном дозволите приступ Google календару.",
+  calendarConnectButton: "Повежи Google календар",
+  calendarConnectDenied:
+    "Google није дозволио календар. У Google Cloud конзоли додајте свој Gmail под Test users и scope calendar.events, па покушајте поново.",
   loginButton: "Настави са Google nalogom",
   signOut: "Одјави се",
   navBrand: "Фризерски салон Весна",

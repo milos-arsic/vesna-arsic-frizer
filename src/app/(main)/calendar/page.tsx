@@ -1,3 +1,4 @@
+import { ConnectCalendarBanner } from "@/components/ConnectCalendarBanner";
 import { WeekCalendar } from "@/components/WeekCalendar";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PageHeader } from "@/components/PageHeader";
@@ -11,6 +12,10 @@ export default function CalendarPage() {
   return (
     <div className="space-y-8">
       <PageHeader title={msg.bookingTitle} />
+
+      <Suspense fallback={null}>
+        <ConnectCalendarBanner />
+      </Suspense>
 
       <Suspense fallback={<LoadingSpinner message={msg.loadingCalendar} />}>
         <WeekCalendar shopPhone={phone} />

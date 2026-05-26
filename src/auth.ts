@@ -47,12 +47,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorization: {
         params: {
           access_type: "offline",
-          scope: [
-            "openid",
-            "email",
-            "profile",
-            "https://www.googleapis.com/auth/calendar.events",
-          ].join(" "),
+          prompt: "select_account",
+          scope: "openid email profile",
         },
       },
     }),

@@ -64,7 +64,7 @@ npm run db:push
 4. Authorized redirect URI: `http://localhost:3002/api/auth/callback/google`
 5. Kopiraj `GOOGLE_CLIENT_ID` i `GOOGLE_CLIENT_SECRET`
 
-**Google kalendar za klijente:** pri odobrenju termina aplikacija kreira događaj u kalendaru klijenta (podsetnik 30 min pre). Klijenti koji su se prijavili pre dodavanja ove funkcije moraju **jednom da se odjave i ponovo prijave** da bi dali dozvolu za kalendar.
+**Google kalendar za klijente:** pri odobrenju termina aplikacija kreira događaj u kalendaru klijenta (podsetnik 30 min pre). Prijava radi bez kalendarske dozvole; na stranici kalendara klijent jednom klikne **Poveži Google kalendar** da bi dobio događaje. U Google Cloud konzoli i dalje mora biti uključen Calendar API i scope `calendar.events` na OAuth consent ekranu.
 
 ### 5. Auth secret
 
